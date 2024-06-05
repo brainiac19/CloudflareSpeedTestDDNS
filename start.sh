@@ -3,17 +3,19 @@
 config_file="./config/config.conf"
 
 # Check if --cfg parameter is provided
-for i in "$@"
-do
-    if [ "$i" == "--cfg" ]
-    then
-        # Get the next argument as the config file
-        shift
-        config_file="$1"
-        # Source the config file given by user and modify the default
-        source "$config_file"
-    fi
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --cfg)
+            shift
+            config_file="$1"
+            ;;
+        *)
+            # Ignore other options for now
+            ;;
+    esac
+    shift
 done
+source $config_file
 # remove the result.csv if exists
 rm cf_ddns/result.csv
 
