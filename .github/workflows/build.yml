@@ -6,7 +6,7 @@ on:
 jobs:
   Building:
       runs-on: ubuntu-latest
-      name: "Build Xray images"
+      name: "Build image"
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
