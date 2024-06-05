@@ -2,7 +2,6 @@
 #		版本：20231004
 #         用于CloudflareST调用，更新hosts和更新cloudflare DNS。
 
-
 #判断是否配置测速地址
 if [[ "$CFST_URL" == http* ]]; then
   CFST_URL_R="-url $CFST_URL -tp $CFST_TP "
@@ -54,11 +53,13 @@ loadIPs() {
       if [[ $current_line -eq 1 ]]; then
         log "没有符合条件的IP，检查能否正常测速"
         return 1
+      else
+        log "满足条件的IP数不足，仍然进行更新"
       fi
-
-      ips+=("${ipAddr}")
-      ip_counter=$((ip_counter + 1))
     fi
+
+    ips+=("${ipAddr}")
+    ip_counter=$((ip_counter + 1))
 
     if [[ ${ip_counter} -ge "$count" ]]; then
       break
@@ -99,17 +100,17 @@ updateDNSRecords() {
     return 1
   fi
 
-  log "为${domain}更新${ips[$@]}"
+  log "为${domain}更新${ips[@]}"
 
   # Get existing DNS records
   local base_url="https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"
   local params="name=${domain}&type=${type}"
   local auth_header="Authorization: Bearer $api_key"
   local json_header="Content-Type: application/json"
-  local response=$(curl -sm10 -X GET "$base_url?$params" -H "$auth_header" -H "$json_header")
+  local response=$(curl -m10 GET "$base_url?$params" -H "$auth_header" -H "$json_header")
 
   if [[ $(echo "$response" | jq -r '.success') != "true" ]]; then
-    log "获取DNS记录失败" 
+    log "获取DNS记录失败"
     return 1
   fi
   local records
@@ -132,7 +133,8 @@ updateDNSRecords() {
       # Update existing record
       local data=$(makeData "$type" "$domain" "$ip")
       local response=$(curl -sm10 -X PUT "$update_url" -H "$auth_header" -H "$json_header" -d "$data")
-      if [[ $(echo "$response" | jq -r '.success') == "true" ]]; then
+      if [[ $(echo "$response" | jq -r '.success') == "true" ]] \
+      || [[ $(echo "$response" | jq -r '.errors | select(length == 1 and .[0].code == 81057)') ]]; then
         success_count=$((success_count + 1))
       fi
     fi
@@ -155,9 +157,11 @@ updateDNSRecords() {
 
 cf_common_command="$CloudflareST $CFST_URL_R -t $CFST_T -n $CFST_N -dn $CFST_DN -tl $CFST_TL -dt $CFST_DT -tp $CFST_TP -sl $CFST_SL -p $CFST_P -tlr $CFST_TLR $CFST_STM"
 
-
 if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
-  (grep -v '^$' ./cf_ddns/ip.txt; grep -v '^$' ./cf_ddns/pr_ip.txt) > ./merged_ip.txt
+  (
+    grep -v '^$' ./cf_ddns/ip.txt
+    grep -v '^$' ./cf_ddns/pr_ip.txt
+  ) >./merged_ip.txt
   if [ "$SKIP_ST" = "0" ]; then
     $cf_common_command -f ./merged_ip.txt -o ./volume/result_4.csv
   fi
