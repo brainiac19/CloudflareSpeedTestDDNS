@@ -23,3 +23,4 @@ RUN /tmp/docker_install.sh
 RUN ls -l /app
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+
