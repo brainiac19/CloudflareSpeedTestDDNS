@@ -3,7 +3,7 @@
 
 #github下在CloudflareSpeedTest使用ghproxy代理
 PROXY=
-
+CloudflareST="./cf_ddns/CloudflareST"
 # 检测CloudflareST是否安装
 LATEST_URL=https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest
 
