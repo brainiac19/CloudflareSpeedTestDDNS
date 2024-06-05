@@ -1,6 +1,6 @@
 #!/bin/bash
 # Default config file
-config_file="./config/config.conf"
+config_file="./volume/config.conf"
 
 # Check if --cfg parameter is provided
 while [[ $# -gt 0 ]]; do

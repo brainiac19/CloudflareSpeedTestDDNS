@@ -157,9 +157,9 @@ cf_common_command="$CloudflareST $CFST_URL_R -t $CFST_T -n $CFST_N -dn $CFST_DN 
 if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
   (grep -v '^$' ./cf_ddns/ip.txt; grep -v '^$' ./cf_ddns/pr_ip.txt) > ./merged_ip.txt
   if [ "$SKIP_ST" = "0" ]; then
-    $cf_common_command -f ./merged_ip.txt -o ./cf_ddns/result_4.csv
+    $cf_common_command -f ./merged_ip.txt -o ./volume/result_4.csv
   fi
-  ips="$(loadIPs "./cf_ddns/result_4.csv" "$IP_COUNT")"
+  ips="$(loadIPs "./volume/result_4.csv" "$IP_COUNT")"
   for hostname in "${HOSTNAMES[@]}"; do
     read -r -a update_result <<<"$(updateDNSRecords "$hostname" "A" "$ips")"
     if [[ ${#update_result[@]} -ne 3 ]]; then
@@ -172,9 +172,9 @@ fi
 
 if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
   if [ "$SKIP_ST" = "0" ]; then
-    $cf_common_command -f ./cf_ddns/ipv6.txt -o ./cf_ddns/result_6.csv
+    $cf_common_command -f ./cf_ddns/ipv6.txt -o ./volume/result_6.csv
   fi
-  ips="$(loadIPs "./cf_ddns/result_6.csv" "$IP_COUNT")"
+  ips="$(loadIPs "./volume/result_6.csv" "$IP_COUNT")"
   for hostname in "${HOSTNAMES[@]}"; do
     read -r -a update_result <<<"$(updateDNSRecords "$hostname" "AAAA" "$ips")"
     if [[ ${#update_result[@]} -ne 3 ]]; then

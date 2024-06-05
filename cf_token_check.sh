@@ -1,5 +1,5 @@
 #!/bin/bash
-config_file="./config.conf"
+config_file="./volume/config.conf"
 source "$config_file"
 
 res=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${zone_id}" -H "Authorization: Bearer $api_key" -H "Content-Type:application/json");
