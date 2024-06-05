@@ -1,13 +1,13 @@
 #!/bin/sh
+# Define the command to be scheduled
+COMMAND="/bin/sh /app/start.sh"
 
 # Check if CRON environment variable is set
 if [ -z "$CRON" ]; then
-    echo "CRON environment variable not set"
-    exit 1
+    echo "CRON environment variable not set, running once..."
+    eval "$COMMAND"
 fi
 
-# Define the command to be scheduled
-COMMAND="/bin/sh /app/start.sh"
 
 # Create a temporary file for the cron job
 TEMP_FILE=$(mktemp)
