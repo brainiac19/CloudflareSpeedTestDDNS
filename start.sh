@@ -17,14 +17,10 @@ do
 done
 # remove the result.csv if exists
 rm cf_ddns/result.csv
-source ./cf_ddns/cf_check.sh
 
 case $DNS_PROVIDER in
     1)
-        source ./cf_ddns/cf_ddns_cloudflare_multiple.sh
-        ;;
-    2)
-        source ./cf_ddns/cf_ddns_dnspod.sh
+        source ./cf_ddns/cf_ddns_cloudflare.sh
         ;;
     *)
         echo "未选择任何DNS服务商"
@@ -32,6 +28,6 @@ case $DNS_PROVIDER in
 esac
 
 # informlog中不能带空格，否则不能被识别
-source ./cf_ddns/cf_push.sh
+#source ./cf_ddns/cf_push.sh
 
 exit 0;
