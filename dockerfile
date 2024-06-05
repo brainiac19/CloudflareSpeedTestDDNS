@@ -21,6 +21,7 @@ RUN chmod +x /tmp/docker_install.sh
 RUN /tmp/docker_install.sh
 
 RUN ls -l /app
+STOPSIGNAL SIGKILL
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
-
+CMD ["crond", "-f"]
