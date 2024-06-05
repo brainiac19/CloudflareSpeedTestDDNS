@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Define the command to be scheduled
 COMMAND="/bin/sh /app/start.sh"
 

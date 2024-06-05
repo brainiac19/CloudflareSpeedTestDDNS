@@ -28,6 +28,6 @@ case $DNS_PROVIDER in
 esac
 
 # informlog中不能带空格，否则不能被识别
-#source ./cf_ddns/cf_push.sh
+# source ./cf_ddns/cf_push.sh
 
 exit 0;
