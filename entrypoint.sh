@@ -1,11 +1,11 @@
 #!/bin/bash
 # Define the command to be scheduled
-COMMAND="/bin/sh /app/start.sh"
+COMMAND="/bin/bash /app/start.sh"
 
 # Check if CRON environment variable is set
 if [ -z "$CRON" ]; then
     echo "CRON environment variable not set, running once..."
-    eval "$COMMAND"
+    $COMMAND
 fi
 
 
