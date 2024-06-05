@@ -50,7 +50,7 @@ loadIPs() {
     ipAddr=$(echo "$line" | awk -F, '{print $1}')
     ipSpeed=$(echo "$line" | awk -F, '{print $6}')
 
-    if [[ $ipSpeed != "0.00" ]]; then
+    if [[ $ipSpeed = "0.00" ]]; then
       if [[ $current_line -eq 1 ]]; then
         log "没有符合条件的IP，检查能否正常测速"
         return 1
