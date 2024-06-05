@@ -12,9 +12,9 @@ RUN apk add --no-cache \
     dcron
 
 WORKDIR /app
-COPY start.sh entrypoint.sh config.conf ./
+COPY start.sh entrypoint.sh ./
 COPY cf_ddns ./cf_ddns
-RUN chmod +x start.sh entrypoint.sh config.conf && chmox -R +x ./cf_ddns
+RUN chmod +x start.sh entrypoint.sh && chmox -R +x ./cf_ddns
 
 COPY docker_install.sh /tmp/docker_install.sh
 RUN chmod +x /tmp/docker_install.sh
