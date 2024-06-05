@@ -16,6 +16,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 source $config_file
+source ./cf_ddns/logger.sh
 # remove the result.csv if exists
 rm cf_ddns/result.csv
 
@@ -24,7 +25,7 @@ case $DNS_PROVIDER in
         source ./cf_ddns/cf_ddns_cloudflare.sh
         ;;
     *)
-        echo "未选择任何DNS服务商"
+        log "未选择任何DNS服务商"
         ;;
 esac
 

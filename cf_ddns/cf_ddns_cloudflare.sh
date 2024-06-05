@@ -2,6 +2,7 @@
 #		版本：20231004
 #         用于CloudflareST调用，更新hosts和更新cloudflare DNS。
 
+
 #判断是否配置测速地址
 if [[ "$CFST_URL" == http* ]]; then
   CFST_URL_R="-url $CFST_URL -tp $CFST_TP "
@@ -27,7 +28,7 @@ fi
 # 检查是否配置反代IP
 if [ "$IP_PR_IP" = "1" ]; then
   curl -sSf -o ./cf_ddns/pr_ip.txt "$CFIP_URL"
-  echo "已更新反向代理列表"
+  log "已更新反向代理列表"
 else
   rm -f ./cf_ddns/pr_ip.txt
 fi
@@ -51,7 +52,7 @@ loadIPs() {
 
     if [[ $ipSpeed != "0.00" ]]; then
       if [[ $current_line -eq 1 ]]; then
-        echo "没有符合条件的IP，检查能否正常测速"
+        log "没有符合条件的IP，检查能否正常测速"
         return 1
       fi
 
@@ -94,11 +95,9 @@ updateDNSRecords() {
 
   # Ensure zone_id and api_key are set
   if [[ -z "$zone_id" || -z "$api_key" ]]; then
-    echo "Error: zone_id or api_key is not set."
+    log "Error: 未设置zone_id或api_key"
     return 1
   fi
-
-  echo "正在为 $domain 添加或更新DNS记录"
 
   # Get existing DNS records
   local base_url="https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"
@@ -108,7 +107,7 @@ updateDNSRecords() {
   local response=$(curl -sm10 -X GET "$base_url?$params" -H "$auth_header" -H "$json_header")
 
   if [[ $(echo "$response" | jq -r '.success') != "true" ]]; then
-    echo "Error fetching DNS records."
+    log "获取DNS记录失败" 
     return 1
   fi
   local records
@@ -185,4 +184,4 @@ if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
     echo "域名: $hostname AAAA记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
   done
 fi
-echo "测速及DNS更新完毕"
+log "测速及DNS更新完毕"
