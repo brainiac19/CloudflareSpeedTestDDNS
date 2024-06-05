@@ -99,6 +99,8 @@ updateDNSRecords() {
     return 1
   fi
 
+  log "为${domain}更新${ips[$@]}"
+
   # Get existing DNS records
   local base_url="https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"
   local params="name=${domain}&type=${type}"
@@ -163,10 +165,10 @@ if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
   for hostname in "${HOSTNAMES[@]}"; do
     read -r -a update_result <<<"$(updateDNSRecords "$hostname" "A" "$ips")"
     if [[ ${#update_result[@]} -ne 3 ]]; then
-      echo "$hostname 更新失败，检查网络或token"
+      log "$hostname 更新失败，检查网络或token"
       continue
     fi
-    echo "域名: $hostname A记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
+    log "域名: $hostname A记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
   done
 fi
 
@@ -178,10 +180,10 @@ if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
   for hostname in "${HOSTNAMES[@]}"; do
     read -r -a update_result <<<"$(updateDNSRecords "$hostname" "AAAA" "$ips")"
     if [[ ${#update_result[@]} -ne 3 ]]; then
-      echo "$hostname 更新失败，检查网络或token"
+      log "$hostname 更新失败，检查网络或token"
       continue
     fi
-    echo "域名: $hostname AAAA记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
+    log "域名: $hostname AAAA记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
   done
 fi
 log "测速及DNS更新完毕"
