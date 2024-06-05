@@ -98,6 +98,8 @@ updateDNSRecords() {
     return 1
   fi
 
+  echo "正在为 $domain 添加或更新DNS记录"
+
   # Get existing DNS records
   local base_url="https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"
   local params="name=${domain}&type=${type}"
