@@ -1,6 +1,6 @@
 #!/bin/bash
 # Default config file
-config_file="config.conf"
+config_file="./config/config.conf"
 # Source the default config file to get all default config
 source "$config_file"
 # Check if --cfg parameter is provided
