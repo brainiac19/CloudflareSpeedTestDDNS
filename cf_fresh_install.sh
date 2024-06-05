@@ -14,35 +14,6 @@ if [ -e ${informlog} ]; then
   rm ${informlog}
 fi
 
-# 检测是否配置DDNS或更新HOSTS任意一个
-if [[ -z ${dnspod_token} ]]; then
-  IP_TO_DNSPOD=0
-else
-  IP_TO_DNSPOD=1
-fi
-
-if [[ -z ${api_key} ]]; then
-  IP_TO_CF=0
-else
-  IP_TO_CF=1
-fi
-
-if [ "$IP_TO_HOSTS" = "true" ]; then
-  IP_TO_HOSTS=1
-else
-  IP_TO_HOSTS=0
-fi
-
-if [ $IP_TO_DNSPOD -eq 1 ] || [ $IP_TO_CF -eq 1 ] || [ $IP_TO_HOSTS -eq 1 ]
-then
-  echo "配置获取成功！"
-else
-  echo "HOSTS和cf_ddns均未配置！！！"
-  echo "HOSTS和cf_ddns均未配置！！！" > $informlog
-  source $cf_push;
-  exit 1;
-fi
-
 # 如果是第一次运行的话，将进行初始化
 if [ ! -e "$flag_file" ]; then
 	# 初始化包列表
@@ -154,7 +125,7 @@ if [ -e ./cf_ddns/tmp/ ]; then
 	rm -rf ./cf_ddns/tmp/
 fi
 if [ ! -f ${CloudflareST} ]; then
-	get_arch=`uname -m`
+	get_arch=$(uname -m)
 	if [[ $get_arch =~ "x86_64" ]];then
 	    echo "this is x86_64"
 	    URL="https://github.com/XIU2/CloudflareSpeedTest/releases/download/$VERSION/CloudflareST_linux_amd64.tar.gz"
