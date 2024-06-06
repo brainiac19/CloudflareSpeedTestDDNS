@@ -9,7 +9,8 @@ RUN apk add --no-cache \
     sed \
     gawk \
     coreutils \
-    dcron
+    dcron \
+    tzdata
 
 WORKDIR /app
 COPY start.sh entrypoint.sh ./
