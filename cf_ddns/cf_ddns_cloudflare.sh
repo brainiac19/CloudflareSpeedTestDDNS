@@ -107,7 +107,7 @@ updateDNSRecords() {
   local params="name=${domain}&type=${type}"
   local auth_header="Authorization: Bearer $api_key"
   local json_header="Content-Type: application/json"
-  local response=$(curl -sm10 --retry 3 --X GET "$base_url?$params" -H "$auth_header" -H "$json_header")
+  local response=$(curl -sm10 --retry 3 -X GET "$base_url?$params" -H "$auth_header" -H "$json_header")
 
   if [[ $(echo "$response" | jq -r '.success') != "true" ]]; then
     log "获取DNS记录失败"

@@ -50,12 +50,3 @@ log() {
 
     echo "$log_entry" >> "$LOG_FILE"
 }
-
-log() {
-    local message="$*"
-    local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
-
-    local log_entry="$timestamp - $message"
-
-    echo "$log_entry" 
-}
