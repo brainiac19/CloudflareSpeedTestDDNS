@@ -107,7 +107,7 @@ updateDNSRecords() {
   local params="name=${domain}&type=${type}"
   local auth_header="Authorization: Bearer $api_key"
   local json_header="Content-Type: application/json"
-  local response=$(curl -sm10 -X GET "$base_url?$params" -H "$auth_header" -H "$json_header")
+  local response=$(curl -sm10 --retry 3 --X GET "$base_url?$params" -H "$auth_header" -H "$json_header")
 
   if [[ $(echo "$response" | jq -r '.success') != "true" ]]; then
     log "获取DNS记录失败"
@@ -125,14 +125,14 @@ updateDNSRecords() {
 
     # If no corresponding IP, delete the record
     if [[ -z "$ip" ]]; then
-      local response=$(curl -sm10 -X DELETE "$update_url" -H "$auth_header" -H "$json_header")
+      local response=$(curl -sm10 --retry 3 -X DELETE "$update_url" -H "$auth_header" -H "$json_header")
       if [[ $(echo "$response" | jq -r '.success') == "true" ]]; then
         delete_count=$((delete_count + 1))
       fi
     else
       # Update existing record
       local data=$(makeData "$type" "$domain" "$ip")
-      local response=$(curl -sm10 -X PUT "$update_url" -H "$auth_header" -H "$json_header" -d "$data")
+      local response=$(curl -sm10 --retry 3 -X PUT "$update_url" -H "$auth_header" -H "$json_header" -d "$data")
       if [[ $(echo "$response" | jq -r '.success') == "true" ]] \
       || [[ $(echo "$response" | jq -r '.errors | select(length == 1 and .[0].code == 81057)') ]]; then
         success_count=$((success_count + 1))
@@ -145,7 +145,7 @@ updateDNSRecords() {
   while [[ $ip_index -lt ${#ips[@]} ]]; do
     local ip="${ips[$ip_index]}"
     local data=$(makeData "$type" "$domain" "$ip")
-    local response=$(curl -sm10 -X POST "$base_url" -H "$auth_header" -H "$json_header" -d "$data")
+    local response=$(curl -sm10 --retry 3 -X POST "$base_url" -H "$auth_header" -H "$json_header" -d "$data")
     if [[ $(echo "$response" | jq -r '.success') == "true" ]]; then
       success_count=$((success_count + 1))
       create_count=$((create_count + 1))

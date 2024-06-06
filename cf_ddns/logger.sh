@@ -30,7 +30,7 @@ rotate_logs() {
 }
 
 log() {
-    local message="$1"
+    local message="$*"
     local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
 
     if [ "$DEBUG" -eq 1 ]; then
@@ -49,4 +49,13 @@ log() {
     fi
 
     echo "$log_entry" >> "$LOG_FILE"
+}
+
+log() {
+    local message="$*"
+    local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+
+    local log_entry="$timestamp - $message"
+
+    echo "$log_entry" 
 }
