@@ -2,41 +2,6 @@
 #		版本：20231004
 #         用于CloudflareST调用，更新hosts和更新cloudflare DNS。
 
-log "===================CFSTDDNS for cloudflare开始运行====================="
-
-#判断是否配置测速地址
-if [[ "$CFST_URL" == http* ]]; then
-  CFST_URL_R="-url $CFST_URL -tp $CFST_TP "
-else
-  CFST_URL_R=""
-fi
-
-# 检查 cfcolo 变量是否为空
-if [[ -n "$cfcolo" ]]; then
-  cfcolo="-cfcolo $cfcolo"
-fi
-
-# 检查 httping_code 变量是否为空
-if [[ -n "$httping_code" ]]; then
-  httping_code="-httping-code $httping_code"
-fi
-
-# 检查 CFST_STM 变量是否为空
-if [[ -n "$CFST_STM" ]]; then
-  CFST_STM="-httping $httping_code $cfcolo"
-fi
-
-# 检查是否配置反代IP
-if [ "$IP_PR_IP" = "1" ]; then
-  if curl -sm10 --retry 3 -X GET "$CFIP_URL" -o ./cf_ddns/pr_ip.txt; then
-    echo "反代IP成功更新"
-  else
-    echo "反代IP更新失败，若存在更早版本的文件将使用旧文件"
-  fi
-else
-  rm -f ./cf_ddns/pr_ip.txt
-fi
-
 loadIPs() {
   local csv_file=$1
   local count=${2:-3}
@@ -52,16 +17,6 @@ loadIPs() {
     fi
 
     ipAddr=$(echo "$line" | awk -F, '{print $1}')
-    ipSpeed=$(echo "$line" | awk -F, '{print $6}')
-
-    if [[ $ipSpeed = "0.00" ]]; then
-      if [[ $current_line -eq 1 ]]; then
-        log "没有符合条件的IP，检查能否正常测速"
-        return 1
-      else
-        log "满足条件的IP数不足，仍将进行更新"
-      fi
-    fi
 
     ips+=("${ipAddr}")
     ip_counter=$((ip_counter + 1))
@@ -100,15 +55,15 @@ updateDNSRecords() {
   local delete_count=0
 
   # Ensure zone_id and api_key are set
-  if [[ -z "$zone_id" || -z "$api_key" ]]; then
+  if [[ -z "$CF_ZONE_ID" || -z "$CF_API_KEY" ]]; then
     log "Error: 未设置zone_id或api_key"
     return 1
   fi
 
   # Get existing DNS records
-  local base_url="https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"
+  local base_url="https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records"
   local params="name=${domain}&type=${type}"
-  local auth_header="Authorization: Bearer $api_key"
+  local auth_header="Authorization: Bearer $CF_API_KEY"
   local json_header="Content-Type: application/json"
   local response=$(curl -sm10 --retry 3 -X GET "$base_url?$params" -H "$auth_header" -H "$json_header")
 
@@ -158,20 +113,11 @@ updateDNSRecords() {
   echo "$success_count $create_count $delete_count"
 }
 
-cf_common_command="$CloudflareST $CFST_URL_R -t $CFST_T -n $CFST_N -dn $CFST_DN -tl $CFST_TL -dt $CFST_DT -tp $CFST_TP -sl $CFST_SL -p $CFST_P -tlr $CFST_TLR $CFST_STM"
 
 if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
-  (
-    grep -v '^$' ./cf_ddns/ip.txt
-    grep -v '^$' ./cf_ddns/pr_ip.txt
-  ) >./merged_ip.txt
-  if [ "$SKIP_ST" = "0" ]; then
-    log "ipv4测速开始..."
-    $cf_common_command -f ./merged_ip.txt -o ./volume/result_4.csv
-  fi
-  ips="$(loadIPs "./volume/result_4.csv" "$IP_COUNT")"
+  ips="$(loadIPs "./volume/result_4.csv" "$CF_IP_COUNT")"
   log "ipv4优选结果：$ips"
-  for hostname in "${HOSTNAMES[@]}"; do
+  for hostname in "${CF_HOSTNAMES[@]}"; do
     log "开始更新A记录：${domain}"
     read -r -a update_result <<<"$(updateDNSRecords "$hostname" "A" "$ips")"
     if [[ ${#update_result[@]} -ne 3 ]]; then
@@ -183,13 +129,9 @@ if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
 fi
 
 if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
-  if [ "$SKIP_ST" = "0" ]; then
-    log "ipv6测速开始..."
-    $cf_common_command -f ./cf_ddns/ipv6.txt -o ./volume/result_6.csv
-  fi
-  ips="$(loadIPs "./volume/result_6.csv" "$IP_COUNT")"
+  ips="$(loadIPs "./volume/result_6.csv" "$CF_IP_COUNT")"
   log "ipv6优选结果：$ips"
-  for hostname in "${HOSTNAMES[@]}"; do
+  for hostname in "${CF_HOSTNAMES[@]}"; do
     log "开始更新AAAA记录：${domain}"
     read -r -a update_result <<<"$(updateDNSRecords "$hostname" "AAAA" "$ips")"
     if [[ ${#update_result[@]} -ne 3 ]]; then
@@ -199,4 +141,3 @@ if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
     log "域名: $hostname AAAA记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
   done
 fi
-log "===================CFSTDDNS for cloudflare运行结束====================="

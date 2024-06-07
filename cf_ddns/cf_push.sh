@@ -21,9 +21,7 @@ WX_tkURL="$wxapi/cgi-bin/gettoken"
 WXURL="$wxapi/cgi-bin/message/send?access_token="
 
 ##tg推送##
-if [[ -z ${telegramBotToken} ]]; then
-   echo "未配置TG推送"
-else
+if [[ -n ${telegramBotToken} ]]; then
    res=$(timeout 20s curl -s -X POST $TGURL -H "Content-type:application/json" -d '{"chat_id":"'$telegramBotUserId'", "parse_mode":"HTML", "text":"'$message_text'"}')
 
    if [ $? == 124 ];then
@@ -40,9 +38,7 @@ fi
 ####
 
 ##PushPlus推送##
-if [[ -z ${PushPlusToken} ]]; then
-   echo "未配置PushPlus推送"
-else
+if [[ -n ${PushPlusToken} ]]; then
    P_message_text=$(sed "$ ! s/$/\\%0A/ " ./cf_ddns/informlog)
    res=$(timeout 20s curl -s -X POST "http://www.pushplus.plus/send" -d "token=${PushPlusToken}" -d "title=cf优选ip推送" -d "content=${P_message_text}" -d "template=html")
 
@@ -60,9 +56,7 @@ fi
 ####
 
 ##Server 酱##
-if [[ -z ${ServerSendKey} ]]; then
-   echo "未配置Server 酱"
-else
+if [[ -n ${ServerSendKey} ]]; then
    res=$(timeout 20s curl -X POST https://sctapi.ftqq.com/${ServerSendKey}.send?title="cf优选ip推送" -d desp=${message_text})
 
    if [ $? == 124 ];then
@@ -79,9 +73,7 @@ fi
 ####
 
 ##PushDeer推送##
-if [[ -z ${PushDeerPushKey} ]]; then
-   echo "未配置PushDeer推送"
-else
+if [[ -n ${PushDeerPushKey} ]]; then
    P_message_text=$(sed "$ ! s/$/\\%0A/ " ./cf_ddns/informlog)
    res=$(timeout 20s curl -s -X POST $PushDeerURL -d text="## cf优选ip推送" -d desp="${P_message_text}" )
    if [ $? == 124 ];then
@@ -99,9 +91,7 @@ fi
 
 ##企业微信推送##
 #判断access_token是否过期
-if [[ -z ${CORPID} ]]; then
-   echo "未配置企业微信推送"
-else
+if [[ -n ${CORPID} ]]; then
    if [ ! -f ".access_token" ]; then
       res=$(curl -X POST $WX_tkURL -H "Content-type:application/json" -d '{"corpid":"'$CORPID'", "corpsecret":"'$SECRET'"}')
       resSuccess=$(echo "$res" | jq -r ".errcode")
@@ -132,9 +122,7 @@ else
    fi
 fi
 
-if [[ $CHECK != "true" ]]; then
-   echo "access_token验证不正确"
-else
+if [[ $CHECK = "true" ]]; then
    access_token=$(cat .access_token | jq -r ".access_token")
    WXURL=$WXURL
    message_text=$(echo "$(sed "$ ! s/$/\\\n/ " ./cf_ddns/informlog | tr -d '\n')")
@@ -155,9 +143,7 @@ else
 fi
 
 #Synology Chat推送
-if [[ -z ${Synology_Chat_URL} ]]; then
-   echo "未配置Synology Chat推送"
-else
+if [[ -n ${Synology_Chat_URL} ]]; then
 	res=$(timeout 20s curl -X POST \
      $Synology_Chat_URL \
      -H "Content-Type: application/json" \

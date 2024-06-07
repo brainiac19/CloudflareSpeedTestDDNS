@@ -1,35 +1,51 @@
 #!/bin/bash
 # Default config file
-config_file="./volume/config.conf"
 
-# Check if --cfg parameter is provided
+source ./volume/config.conf
+source ./cf_ddns/logger.sh
+
+log "===================CFSTDDNS 运行开始====================="
+source ./cf_ddns/init.sh
+
+rm -rf ./cf_ddns/informlog
+
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --cfg)
-            shift
-            config_file="$1"
-            ;;
-        *)
-            # Ignore other options for now
-            ;;
+    -ip | --ip_family)
+        shift
+        IP_FAMILY="$1"
+        ;;
+    -st | --speed_test_only)
+        SPEED_TEST_ONLY=1
+        ;;
+    -ddns | --ddns_only)
+        DDNS_ONLY=1
+        ;;
+    *)
+        log "不支持的选项: $1"
+        exit 1
+        ;;
     esac
     shift
 done
-source $config_file
-source ./cf_ddns/logger.sh
-# remove the result.csv if exists
-rm cf_ddns/result.csv
 
-case $DNS_PROVIDER in
-    1)
-        source ./cf_ddns/cf_ddns_cloudflare.sh
-        ;;
-    *)
-        log "未选择任何DNS服务商"
-        ;;
-esac
+if [[ -z "$DDNS_ONLY" ]]; then
+    source ./cf_ddns/cf_speedtest.sh
+fi
 
+if [[ -z "$SPEED_TEST_ONLY" ]]; then
+    for DNS_PROVIDER in "${DNS_PROVIDERS[@]}"; do
+        case $DNS_PROVIDER in
+        cloudflare)
+            source ./cf_ddns/cf_ddns_cloudflare.sh
+            ;;
+        *)
+            log "不支持的DNS服务商: $DNS_PROVIDER"
+            ;;
+        esac
+    done
+fi
+log "===================CFSTDDNS 运行结束====================="
 # informlog中不能带空格，否则不能被识别
 # source ./cf_ddns/cf_push.sh
 
-exit 0;
