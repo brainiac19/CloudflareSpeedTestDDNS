@@ -3,6 +3,18 @@
 cd /app
 source ./volume/config.conf
 source ./cf_ddns/logger.sh
+LOCKFILE="/tmp/start.lock"
+exec 200>"$LOCKFILE"
+
+cleanup() {
+    flock -u 200
+}
+
+trap cleanup EXIT
+
+flock 200
+
+
 
 log "===================CFSTDDNS 运行开始====================="
 source ./cf_ddns/init.sh
