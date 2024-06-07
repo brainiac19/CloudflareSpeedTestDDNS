@@ -38,16 +38,18 @@ if [ "$IP_FAMILY" = "ipv4" ] || [ "$IP_FAMILY" = "dualstack" ]; then
     [[ -n "$CFST_DD" ]] && [[ "$CFST_DD" -eq 1 ]] && cfst_v4_command+=" -dd"
 
     log "IPV4测速开始..."
+    start_time=$(date +%s)
     if [[ -n "$CFST_E_TIMEOUT" ]]; then
         eval timeout "$CFST_E_TIMEOUT" "$cfst_v4_command"
     else
         eval "$cfst_v4_command"
     fi
+    end_time=$(date +%s)
 
     if [ $? -eq 124 ]; then
-        log "IPV4测速超时"
+        log "IPV4测速超时，用时 $(parseSeconds $((end_time - start_time)))"
     else
-        log "IPV4测速完成"
+        log "IPV4测速完成，用时 $(parseSeconds $((end_time - start_time)))"
     fi
 
     rm -f ./merged_ip.txt
@@ -73,15 +75,17 @@ if [ "$IP_FAMILY" = "ipv6" ] || [ "$IP_FAMILY" = "dualstack" ]; then
     [[ -n "$CFST_TLR_V6" ]] && cfst_v6_command+=" -tlr $CFST_TLR_V6"
     [[ -n "$CFST_DD_V6" ]] && [[ "$CFST_DD_V6" -eq 1 ]] && cfst_v6_command+=" -dd"
     log "IPV6测速开始..."
+    start_time=$(date +%s)
     if [[ -n "$CFST_E_TIMEOUT_V6" ]]; then
         eval timeout "$CFST_E_TIMEOUT_V6" "$cfst_v6_command"
     else
         eval "$cfst_v6_command"
     fi
+    end_time=$(date +%s)
 
     if [ $? -eq 124 ]; then
-        log "IPV6测速超时"
+        log "IPV6测速超时，用时 $(parseSeconds $((end_time - start_time)))"
     else
-        log "IPV6测速完成"
+        log "IPV6测速完成，用时 $(parseSeconds $((end_time - start_time)))"
     fi
 fi

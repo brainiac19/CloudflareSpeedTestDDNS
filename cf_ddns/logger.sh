@@ -50,3 +50,22 @@ log() {
 
     echo "$log_entry" >> "$LOG_FILE"
 }
+
+parseSeconds() {
+    local runtime=$1
+    local hours=$((runtime / 3600))
+    local minutes=$(( (runtime % 3600) / 60 ))
+    local seconds=$((runtime % 60))
+
+    # Construct the formatted time string
+    local time_str=""
+    if [ $hours -gt 0 ]; then
+        time_str="${hours}时${minutes}分${seconds}秒"
+    elif [ $minutes -gt 0 ]; then
+        time_str="${minutes}分${seconds}秒"
+    else
+        time_str="${seconds}秒"
+    fi
+
+    echo "$time_str"
+}
