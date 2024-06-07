@@ -30,6 +30,7 @@ if [ "$IP_FAMILY" = "ipv4" ] || [ "$IP_FAMILY" = "dualstack" ]; then
     [[ -n "$CFST_N" ]] && cfst_v4_command+=" -n $CFST_N"
     [[ -n "$CFST_DN" ]] && cfst_v4_command+=" -dn $CFST_DN"
     [[ -n "$CFST_TL" ]] && cfst_v4_command+=" -tl $CFST_TL"
+    [[ -n "$CFST_TLL" ]] && cfst_v4_command+=" -tll $CFST_TLL"
     [[ -n "$CFST_DT" ]] && cfst_v4_command+=" -dt $CFST_DT"
     [[ -n "$CFST_TP" ]] && cfst_v4_command+=" -tp $CFST_TP"
     [[ -n "$CFST_SL" ]] && cfst_v4_command+=" -sl $CFST_SL"
@@ -48,11 +49,12 @@ if [ "$IP_FAMILY" = "ipv4" ] || [ "$IP_FAMILY" = "dualstack" ]; then
 
     if [ $? -eq 124 ]; then
         log "IPV4测速超时，用时 $(parseSeconds $((end_time - start_time)))"
+        rm -f "$VOLUME_PATH"/result_4.csv
     else
         log "IPV4测速完成，用时 $(parseSeconds $((end_time - start_time)))"
     fi
 
-    rm -f ./merged_ip.txt
+    rm -f "$VOLUME_PATH"/merged_ip.txt
 fi
 
 if [ "$IP_FAMILY" = "ipv6" ] || [ "$IP_FAMILY" = "dualstack" ]; then
@@ -68,6 +70,7 @@ if [ "$IP_FAMILY" = "ipv6" ] || [ "$IP_FAMILY" = "dualstack" ]; then
     [[ -n "$CFST_N_V6" ]] && cfst_v6_command+=" -n $CFST_N_V6"
     [[ -n "$CFST_DN_V6" ]] && cfst_v6_command+=" -dn $CFST_DN_V6"
     [[ -n "$CFST_TL_V6" ]] && cfst_v6_command+=" -tl $CFST_TL_V6"
+    [[ -n "$CFST_TLL_V6" ]] && cfst_v6_command+=" -tll $CFST_TLL_V6"
     [[ -n "$CFST_DT_V6" ]] && cfst_v6_command+=" -dt $CFST_DT_V6"
     [[ -n "$CFST_TP_V6" ]] && cfst_v6_command+=" -tp $CFST_TP_V6"
     [[ -n "$CFST_SL_V6" ]] && cfst_v6_command+=" -sl $CFST_SL_V6"
@@ -85,6 +88,7 @@ if [ "$IP_FAMILY" = "ipv6" ] || [ "$IP_FAMILY" = "dualstack" ]; then
 
     if [ $? -eq 124 ]; then
         log "IPV6测速超时，用时 $(parseSeconds $((end_time - start_time)))"
+        rm -f "$VOLUME_PATH"/result_6.csv
     else
         log "IPV6测速完成，用时 $(parseSeconds $((end_time - start_time)))"
     fi

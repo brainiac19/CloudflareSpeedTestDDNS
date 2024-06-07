@@ -113,31 +113,38 @@ updateDNSRecords() {
   echo "$success_count $create_count $delete_count"
 }
 
-
 if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
   ips="$(loadIPs "./volume/result_4.csv" "$CF_IP_COUNT")"
-  log "ipv4优选结果：$ips"
-  for hostname in "${CF_HOSTNAMES[@]}"; do
-    log "开始更新A记录：${domain}"
-    read -r -a update_result <<<"$(updateDNSRecords "$hostname" "A" "$ips")"
-    if [[ ${#update_result[@]} -ne 3 ]]; then
-      log "$hostname 更新失败，检查网络或token"
-      continue
-    fi
-    log "域名: $hostname A记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
-  done
+  if [[ -n $ips ]]; then
+    log "ipv4优选结果：$ips"
+    for hostname in "${CF_HOSTNAMES[@]}"; do
+      log "开始更新A记录：${domain}"
+      read -r -a update_result <<<"$(updateDNSRecords "$hostname" "A" "$ips")"
+      if [[ ${#update_result[@]} -ne 3 ]]; then
+        log "$hostname 更新失败，检查网络或token"
+        continue
+      fi
+      log "域名: $hostname A记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
+    done
+  else
+    log "没有获取到ipv4优选结果，跳过DDNS更新"
+  fi
 fi
 
 if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
   ips="$(loadIPs "./volume/result_6.csv" "$CF_IP_COUNT")"
-  log "ipv6优选结果：$ips"
-  for hostname in "${CF_HOSTNAMES[@]}"; do
-    log "开始更新AAAA记录：${domain}"
-    read -r -a update_result <<<"$(updateDNSRecords "$hostname" "AAAA" "$ips")"
-    if [[ ${#update_result[@]} -ne 3 ]]; then
-      log "$hostname 更新失败，检查网络或token"
-      continue
-    fi
-    log "域名: $hostname AAAA记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
-  done
+  if [[ -n $ips ]]; then
+    log "ipv6优选结果：$ips"
+    for hostname in "${CF_HOSTNAMES[@]}"; do
+      log "开始更新AAAA记录：${domain}"
+      read -r -a update_result <<<"$(updateDNSRecords "$hostname" "AAAA" "$ips")"
+      if [[ ${#update_result[@]} -ne 3 ]]; then
+        log "$hostname 更新失败，检查网络或token"
+        continue
+      fi
+      log "域名: $hostname AAAA记录: ${update_result[0]}成功，${update_result[1]}新增，${update_result[2]}删除"
+    done
+  else
+    log "没有获取到ipv6优选结果，跳过DDNS更新"
+  fi
 fi
