@@ -1,8 +1,10 @@
 #!/bin/bash
 # Define the command to be scheduled
 cd /app || exit
+export PATH="/app:$PATH"
 CRONTAB="/etc/crontabs/root"
 echo "Starting entrypoint script..."
+ln -s ./start.sh ./start
 rm -rf $CRONTAB
 
 # Check if CRON environment variable is set
