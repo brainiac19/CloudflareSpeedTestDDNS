@@ -3,7 +3,6 @@
 cd /app || exit
 CRONTAB="/etc/crontabs/root"
 echo "Starting entrypoint script..."
-ln -s ./start.sh ./start
 rm -rf $CRONTAB
 
 # Check if CRON environment variable is set
@@ -13,7 +12,7 @@ env >>/etc/environment
 
 while IFS='=' read -r -d '' n v; do
     if [[ "$n" =~ ^CRON ]]; then
-        echo -e "$n >/proc/1/fd/1 2>/proc/1/fd/2" >>"$CRONTAB"
+        echo -e "$v >/proc/1/fd/1 2>/proc/1/fd/2" >>"$CRONTAB"
     fi
 done < <(env -0)
 
