@@ -1,6 +1,6 @@
 #!/bin/bash
 # Default config file
-
+cd /app
 source ./volume/config.conf
 source ./cf_ddns/logger.sh
 
