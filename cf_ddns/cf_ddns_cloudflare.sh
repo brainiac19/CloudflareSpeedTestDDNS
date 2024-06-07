@@ -113,7 +113,8 @@ updateDNSRecords() {
   echo "$success_count $create_count $delete_count"
 }
 
-if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
+log "开始更新DDNS..."
+if [ "$IP_FAMILY" = "ipv4" ] || [ "$IP_FAMILY" = "dualstack" ]; then
   ips="$(loadIPs "./volume/result_4.csv" "$CF_IP_COUNT")"
   if [[ -n $ips ]]; then
     log "ipv4优选结果：$ips"
@@ -131,7 +132,7 @@ if [ "$IP_ADDR" = "ipv4" ] || [ "$IP_ADDR" = "dualstack" ]; then
   fi
 fi
 
-if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
+if [ "$IP_FAMILY" = "ipv6" ] || [ "$IP_FAMILY" = "dualstack" ]; then
   ips="$(loadIPs "./volume/result_6.csv" "$CF_IP_COUNT")"
   if [[ -n $ips ]]; then
     log "ipv6优选结果：$ips"
@@ -148,3 +149,4 @@ if [ "$IP_ADDR" = "ipv6" ] || [ "$IP_ADDR" = "dualstack" ]; then
     log "没有获取到ipv6优选结果，跳过DDNS更新"
   fi
 fi
+log "更新DDNS结束"
