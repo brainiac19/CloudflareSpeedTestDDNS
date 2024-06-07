@@ -18,7 +18,7 @@ if [ "$IP_FAMILY" = "ipv4" ] || [ "$IP_FAMILY" = "dualstack" ]; then
         grep -v '^$' "$VOLUME_PATH"/pr_ip.txt
     ) >"$VOLUME_PATH"/merged_ip.txt
 
-    cfst_v4_command="$CloudflareST -f $VOLUME_PATH./merged_ip.txt -o $VOLUME_PATH/result_4.csv"
+    cfst_v4_command="$CloudflareST -f $VOLUME_PATH/merged_ip.txt -o $VOLUME_PATH/result_4.csv"
     [[ "$CFST_URL" == http* ]] && cfst_v4_command+=" -url $CFST_URL"
     [[ -n "$CFST_TP" ]] && cfst_v4_command+=" -tp $CFST_TP"
     [[ -n "$CFST_HTTPING" ]] && [[ "$CFST_HTTPING" -eq 1 ]] && {
