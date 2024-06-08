@@ -10,7 +10,7 @@ cleanup() {
 
 trap cleanup EXIT HUP INT QUIT TERM
 
-[[ -e "$LOCKFILE" && -e /proc/$(cat "$LOCKFILE") ]] && exit 1 || rm -f "$LOCKFILE"
+[[ -e "$LOCKFILE" && -e /proc/$(cat "$LOCKFILE") ]] && (log "已有实例运行中，退出"; exit 1) || rm -f "$LOCKFILE"
 
 echo $$ > "$LOCKFILE"
 
