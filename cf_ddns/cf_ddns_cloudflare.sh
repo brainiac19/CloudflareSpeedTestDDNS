@@ -119,7 +119,7 @@ if [ "$IP_FAMILY" = "ipv4" ] || [ "$IP_FAMILY" = "dualstack" ]; then
   if [[ -n $ips ]]; then
     log "ipv4优选结果：$ips"
     for hostname in "${CF_HOSTNAMES[@]}"; do
-      log "开始更新A记录：${domain}"
+      log "开始更新A记录：${hostname}"
       read -r -a update_result <<<"$(updateDNSRecords "$hostname" "A" "$ips")"
       if [[ ${#update_result[@]} -ne 3 ]]; then
         log "$hostname 更新失败，检查网络或token"
@@ -137,7 +137,7 @@ if [ "$IP_FAMILY" = "ipv6" ] || [ "$IP_FAMILY" = "dualstack" ]; then
   if [[ -n $ips ]]; then
     log "ipv6优选结果：$ips"
     for hostname in "${CF_HOSTNAMES[@]}"; do
-      log "开始更新AAAA记录：${domain}"
+      log "开始更新AAAA记录：${hostname}"
       read -r -a update_result <<<"$(updateDNSRecords "$hostname" "AAAA" "$ips")"
       if [[ ${#update_result[@]} -ne 3 ]]; then
         log "$hostname 更新失败，检查网络或token"
